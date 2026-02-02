@@ -8,24 +8,8 @@ Let's see how we can Setup & Install ArgoCD (UI and CLI) and access via the brow
 
 Before starting, ensure you have the following installed on your system:
 
-1. **Docker** → Required for Kind to run containers as cluster nodes.
+1. kubernetes custer [kubeadm or EKS]
 
-   ```bash
-   sudo apt-get update
-   sudo apt install docker.io -y
-   sudo usermod -aG docker $USER && newgrp docker
-   docker --version
-
-   docker ps
-   ```
-
-2. **Kind (Kubernetes in Docker)** → To create the cluster.
-
-   ```bash
-   kind version
-   ```
-
-   [Install Guide](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 
 3. **kubectl** → To interact with the cluster.
 
@@ -49,47 +33,13 @@ Before starting, ensure you have the following installed on your system:
 > 
 > You can either follow the below steps or directly run the script [setup_argocd.sh](./setup_argocd.sh)
 > 
-> The script will create **kind cluster** and **Installs ArgoCD UI and CLI** based on your choice (using HELM or manifest)
+> The script will  **Installs ArgoCD UI and CLI** based on your choice (using HELM or manifest)
 > 
 > But before using this guide or `setup_argocd.sh`, make sure you replace the `172.31.19.178` address with your EC2 instance private ip in Cluster config for `apiServerAddress`
 
 ---
 
-# Step 1: Create Kind Cluster
-
-Save your cluster config as `kind-config.yaml`:
-
-```yaml
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-networking:
-  apiServerAddress: "172.31.19.178"   # Change this to your EC2 private IP (run "hostname -I" to check or from your EC2 dashboard)
-  apiServerPort: 33893
-nodes:
-  - role: control-plane
-    image: kindest/node:v1.33.1
-  - role: worker
-    image: kindest/node:v1.33.1
-  - role: worker
-    image: kindest/node:v1.33.1
-```
-
-> Why `apiServerAddress` & `apiServerPort` in kind config?
-→ To ensure each kind cluster API server is reachable from the ArgoCD pods. This avoids conflicts (since kind defaults to random localhost ports).
-
-Create the cluster:
-
-```bash
-kind create cluster --name argocd-cluster --config kind-config.yaml
-```
-
-Verify:
-
-```bash
-kubectl cluster-info
-kubectl get nodes
-```
-
+#  Step1: create K8s Cluster
 ---
 
 #  Step 2: Install ArgoCD
